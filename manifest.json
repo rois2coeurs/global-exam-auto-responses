@@ -4,7 +4,11 @@
   "name": "globalexam-auto-responses",
   "version": "1.0",
 
-  "permissions": ["https://exam.global-exam.com/*"],
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "https://exam.global-exam.com/*"
+  ],
 
   "background": {
     "scripts": ["background.js"]
