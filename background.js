@@ -9,6 +9,11 @@ async function isDisabled() {
   return data.disable;
 }
 
+async function isAutoValidateEnabled() {
+  const data = await browser.storage.sync.get({ autoValidate: false });
+  return data.autoValidate;
+}
+
 browser.webRequest.onBeforeRequest.addListener(
   async (details) => {
     if ((await isDisabled()) || !is_valid_exam_url(details.url)) return;
@@ -58,6 +63,7 @@ async function process_exam_questions(data) {
   data.props.examQuestions.data.forEach(async (element) => {
     click_right_answers(element.exam_answers, tabs);
   });
+  if (await isAutoValidateEnabled()) click_validate(tabs);
 }
 
 function click_input_by_value(value, tabs) {
@@ -74,6 +80,15 @@ function warn_toast(value, tabs) {
     browser.tabs.sendMessage(tab.id, {
       action: "warnToast",
       value: value,
+    });
+  });
+}
+
+function click_validate(tabs) {
+  tabs.forEach((tab) => {
+    browser.tabs.sendMessage(tab.id, {
+      action: "clickValidate",
+      value: "clickValidate",
     });
   });
 }
