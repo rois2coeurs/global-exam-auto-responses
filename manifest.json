@@ -10,6 +10,15 @@
     "https://exam.global-exam.com/*"
   ],
 
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "@extension-without-data-collection",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+
   "background": {
     "scripts": ["background.js"]
   },
