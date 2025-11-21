@@ -1,0 +1,18 @@
+{
+  "description": "GlobalExam Auto Responses",
+  "manifest_version": 2,
+  "name": "globalexam-auto-responses",
+  "version": "1.0",
+
+  "permissions": ["https://exam.global-exam.com/*"],
+
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://exam.global-exam.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
