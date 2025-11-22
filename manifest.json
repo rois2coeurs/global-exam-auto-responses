@@ -12,14 +12,14 @@
     "https://exam.global-exam.com/*"
   ],
 
-  "web_accessible_resources": ["popup/warning.svg"],
+  "web_accessible_resources": ["assets/public/*"],
 
   "browser_action": {
     "default_popup": "popup/index.html"
   },
 
   "icons": {
-    "64": "icon.png"
+    "64": "assets/icon.png"
   },
 
   "browser_specific_settings": {

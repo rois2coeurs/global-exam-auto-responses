@@ -69,14 +69,14 @@ function createToast(htmlContent, bgColor, duration) {
 }
 
 function showWarnToast(message) {
-  const svgPath = browser.runtime.getURL("popup/warning.svg");
+  const svgPath = browser.runtime.getURL("assets/public/warning.svg");
   const html = `
        <div style="display:flex;align-items:center;gap:8px;">
          <img src="${svgPath}" width="24" height="24" />
          <span>${message}</span>
        </div>
      `;
-  createToast(html, "#e69500", 10000);
+  createToast(html, "#e69500", 15000);
 }
 
 browser.runtime.onMessage.addListener((msg) => {
