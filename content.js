@@ -1,4 +1,8 @@
 let inputsToClick = [];
+let isDebug = false;
+browser.storage.sync.get({ debug: false }).then((value) => {
+  isDebug = value.debug;
+});
 
 function clickInputByValue(value, maxRetries = 10, interval = 300) {
   let attempt = 0;
@@ -7,22 +11,24 @@ function clickInputByValue(value, maxRetries = 10, interval = 300) {
     const input = document.querySelector(`input[value="${value}"]`);
 
     if (input) {
-      input.focus(); // focus first
+      input.focus();
       const event = new MouseEvent("click", {
         bubbles: true,
         cancelable: true,
         view: window,
       });
       input.dispatchEvent(event);
-      console.log(`Clicked input with value "${value}"`);
+      if (isDebug) console.log(`Clicked input with value "${value}"`);
     } else if (attempt < maxRetries) {
       attempt++;
-      console.log(
-        `Input "${value}" not found. Retrying ${attempt}/${maxRetries}...`,
-      );
+      if (isDebug)
+        console.log(
+          `Input "${value}" not found. Retrying ${attempt}/${maxRetries}...`,
+        );
       setTimeout(tryClick, interval);
     } else {
-      console.warn(`Input "${value}" not found after ${maxRetries} attempts`);
+      if (isDebug)
+        console.warn(`Input "${value}" not found after ${maxRetries} attempts`);
     }
   };
 
@@ -32,11 +38,6 @@ function clickInputByValue(value, maxRetries = 10, interval = 300) {
 browser.runtime.onMessage.addListener((msg) => {
   if (msg.action === "clickInput") {
     inputsToClick.push(msg.value);
-
     clickInputByValue(msg.value);
   }
-});
-
-window.addEventListener("load", () => {
-  inputsToClick.forEach((val) => clickInputByValue(val));
 });

@@ -4,9 +4,14 @@ function is_valid_exam_url(url) {
   return regex.test(url);
 }
 
+async function isDisabled() {
+  const data = await browser.storage.sync.get({ disable: false });
+  return data.disable;
+}
+
 browser.webRequest.onBeforeRequest.addListener(
   async (details) => {
-    if (!is_valid_exam_url(details.url)) return;
+    if ((await isDisabled()) || !is_valid_exam_url(details.url)) return;
 
     const filter = browser.webRequest.filterResponseData(details.requestId);
 
@@ -43,6 +48,13 @@ async function process_exam_questions(data) {
   const tabs = await browser.tabs.query({
     url: "https://exam.global-exam.com/*",
   });
+  if (data.props.activitySettings.correction.during_activity === null) {
+    warn_toast(
+      "You need to enable the correction for the extension to work",
+      tabs,
+    );
+    return;
+  }
   data.props.examQuestions.data.forEach(async (element) => {
     click_right_answers(element.exam_answers, tabs);
   });
@@ -52,6 +64,15 @@ function click_input_by_value(value, tabs) {
   tabs.forEach((tab) => {
     browser.tabs.sendMessage(tab.id, {
       action: "clickInput",
+      value: value,
+    });
+  });
+}
+
+function warn_toast(value, tabs) {
+  tabs.forEach((tab) => {
+    browser.tabs.sendMessage(tab.id, {
+      action: "warnToast",
       value: value,
     });
   });
