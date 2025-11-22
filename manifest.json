@@ -12,7 +12,7 @@
 
   "browser_specific_settings": {
     "gecko": {
-      "id": "@extension-without-data-collection",
+      "id": "@globalexam-auto-responses",
       "data_collection_permissions": {
         "required": ["none"]
       }

@@ -22,34 +22,37 @@ browser.webRequest.onBeforeRequest.addListener(
       const text = await blob.text();
       try {
         const data = JSON.parse(text);
-        console.log("Response JSON:", data);
-
         await process_exam_questions(data);
       } catch (e) {
-        console.log("Response text:", text);
+        console.error(e);
       }
 
       filter.close();
     };
   },
-  { urls: ["<all_urls>"] },
+  { urls: ["https://exam.global-exam.com/training/*"] },
   ["blocking"],
 );
 
-function click_right_answers(questions) {
-  for (const e of questions) if (e.is_right_answer) click_input_by_value(e.id);
+function click_right_answers(questions, tabs) {
+  for (const e of questions)
+    if (e.is_right_answer) click_input_by_value(e.id, tabs);
 }
 
 async function process_exam_questions(data) {
-  data.props.examQuestions.data.forEach((element) => {
-    click_right_answers(element.exam_answers);
+  const tabs = await browser.tabs.query({
+    url: "https://exam.global-exam.com/*",
+  });
+  data.props.examQuestions.data.forEach(async (element) => {
+    click_right_answers(element.exam_answers, tabs);
   });
 }
 
-function click_input_by_value(value) {
-  browser.tabs.query({ url: "https://exam.global-exam.com/*" }).then((tabs) => {
-    tabs.forEach((tab) => {
-      browser.tabs.sendMessage(tab.id, { action: "clickInput", value: value });
+function click_input_by_value(value, tabs) {
+  tabs.forEach((tab) => {
+    browser.tabs.sendMessage(tab.id, {
+      action: "clickInput",
+      value: value,
     });
   });
 }
