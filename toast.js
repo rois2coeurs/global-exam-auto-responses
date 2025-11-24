@@ -1,5 +1,6 @@
 function ensureContainer() {
   let container = document.getElementById("___gear_toast_container");
+
   if (!container) {
     container = document.createElement("div");
     container.id = "___gear_toast_container";
@@ -12,10 +13,11 @@ function ensureContainer() {
     container.style.gap = "8px";
     document.body.appendChild(container);
   }
+
   return container;
 }
 
-function createToast(htmlContent, bgColor, duration) {
+function createToast(contentNode, bgColor, duration) {
   const container = ensureContainer();
 
   const toast = document.createElement("div");
@@ -31,12 +33,7 @@ function createToast(htmlContent, bgColor, duration) {
   toast.style.opacity = "0";
   toast.style.transition = "opacity 0.3s";
 
-  const content = document.createElement("div");
-  content.innerHTML = htmlContent;
-  content.style.display = "flex";
-  content.style.alignItems = "center";
-  content.style.gap = "8px";
-  toast.appendChild(content);
+  toast.appendChild(contentNode);
 
   const closeBtn = document.createElement("div");
   closeBtn.textContent = "✕";
@@ -70,13 +67,24 @@ function createToast(htmlContent, bgColor, duration) {
 
 function showWarnToast(message) {
   const svgPath = browser.runtime.getURL("assets/public/warning.svg");
-  const html = `
-       <div style="display:flex;align-items:center;gap:8px;">
-         <img src="${svgPath}" width="24" height="24" />
-         <span>${message}</span>
-       </div>
-     `;
-  createToast(html, "#e69500", 15000);
+
+  const wrapper = document.createElement("div");
+  wrapper.style.display = "flex";
+  wrapper.style.alignItems = "center";
+  wrapper.style.gap = "8px";
+
+  const img = document.createElement("img");
+  img.src = svgPath;
+  img.width = 24;
+  img.height = 24;
+
+  const span = document.createElement("span");
+  span.textContent = message;
+
+  wrapper.appendChild(img);
+  wrapper.appendChild(span);
+
+  createToast(wrapper, "#e69500", 15000);
 }
 
 browser.runtime.onMessage.addListener((msg) => {
