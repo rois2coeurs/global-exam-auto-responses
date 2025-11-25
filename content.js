@@ -11,14 +11,9 @@ function clickInputByValue(value, maxRetries = 10, interval = 300) {
     const input = document.querySelector(`input[value="${value}"]`);
 
     if (input) {
-      input.focus();
-      const event = new MouseEvent("click", {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-      });
-      input.dispatchEvent(event);
+      input.click();
       if (isDebug) console.log(`Clicked input with value "${value}"`);
+      inputsToClick = inputsToClick.filter((i) => i != value);
     } else if (attempt < maxRetries) {
       attempt++;
       if (isDebug)
@@ -35,9 +30,39 @@ function clickInputByValue(value, maxRetries = 10, interval = 300) {
   tryClick();
 }
 
+async function clickValidate(maxRetries = 10, interval = 300) {
+  let attempt = 0;
+
+  const tryClick = () => {
+    const btn = [...document.querySelectorAll("button")].find((b) =>
+      ["valider", "suivant", "terminer"].includes(
+        b.textContent.trim().toLowerCase(),
+      ),
+    );
+    if (inputsToClick.length > 0) {
+      setTimeout(tryClick, interval);
+      if (isDebug) console.log("Waiting for all responses to be clicked!");
+    } else if (btn) {
+      btn.click();
+      if (isDebug) console.log(`Clicked validate with value "${value}"`);
+    } else if (attempt < maxRetries) {
+      attempt++;
+      if (isDebug)
+        console.log(`Validate not found. Retrying ${attempt}/${maxRetries}...`);
+      setTimeout(tryClick, interval);
+    } else {
+      if (isDebug)
+        console.warn(`Validate not found after ${maxRetries} attempts`);
+    }
+  };
+  tryClick();
+}
+
 browser.runtime.onMessage.addListener((msg) => {
   if (msg.action === "clickInput") {
     inputsToClick.push(msg.value);
     clickInputByValue(msg.value);
+  } else if (msg.action === "clickValidate") {
+    clickValidate();
   }
 });
